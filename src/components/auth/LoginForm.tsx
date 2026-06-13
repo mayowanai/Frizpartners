@@ -18,22 +18,16 @@ function SubmitButton() {
   );
 }
 
-export default function LoginForm({
-  social,
-}: {
-  social: { google: boolean; kakao: boolean };
-}) {
+export default function LoginForm({ social }: { social: { google: boolean } }) {
   const [state, action] = useFormState(loginAction, undefined);
 
-  function oauth(provider: 'google' | 'kakao') {
+  function loginWithGoogle() {
     const supabase = createClient();
     supabase.auth.signInWithOAuth({
-      provider,
+      provider: 'google',
       options: { redirectTo: `${window.location.origin}/auth/callback?next=/mypage` },
     });
   }
-
-  const anySocial = social.google || social.kakao;
 
   return (
     <div className="mt-7">
@@ -59,33 +53,22 @@ export default function LoginForm({
           <span className="h-px flex-1 bg-assi-ink/10" />
         </div>
 
-        <div className="mt-4 space-y-2.5">
+        <div className="mt-4">
           <button
             type="button"
             disabled={!social.google}
-            onClick={() => oauth('google')}
+            onClick={loginWithGoogle}
             className="flex w-full items-center justify-center gap-2 rounded-2xl border border-assi-ink/15 bg-white/80 px-4 py-3 text-sm font-medium text-assi-ink transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className="font-display font-bold text-[#4285F4]">G</span>
             Google로 계속하기
             {!social.google && <span className="text-xs text-assi-ink/40">(준비 중)</span>}
           </button>
-
-          <button
-            type="button"
-            disabled={!social.kakao}
-            onClick={() => oauth('kakao')}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#FEE500] px-4 py-3 text-sm font-medium text-[#3C1E1E] transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <span className="font-bold">💬</span>
-            카카오로 계속하기
-            {!social.kakao && <span className="text-xs text-[#3C1E1E]/50">(준비 중)</span>}
-          </button>
         </div>
 
-        {!anySocial && (
+        {!social.google && (
           <p className="mt-3 text-center text-[11px] text-assi-ink/40">
-            소셜 로그인은 곧 활성화됩니다. 지금은 이메일로 로그인해주세요.
+            Google 로그인은 곧 활성화됩니다. 지금은 이메일로 로그인해주세요.
           </p>
         )}
       </div>

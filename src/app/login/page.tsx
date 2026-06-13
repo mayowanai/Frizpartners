@@ -4,7 +4,6 @@ import LoginForm from '@/components/auth/LoginForm';
 // 소셜 로그인 버튼 활성화 여부 (Supabase에 프로바이더 설정 후 env 로 켭니다)
 const social = {
   google: process.env.NEXT_PUBLIC_GOOGLE_ENABLED === 'true',
-  kakao: process.env.NEXT_PUBLIC_KAKAO_ENABLED === 'true',
 };
 
 export default function LoginPage() {
