@@ -1,20 +1,27 @@
 import { redirect } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
-import { auth } from '@/auth';
-import { getCartItems } from '@/lib/db';
+import { createClient } from '@/lib/supabase/server';
 import { products } from '@/lib/data/products';
 import CartView, { type CartLine } from '@/components/cart/CartView';
 
 export const dynamic = 'force-dynamic';
 
 export default async function CartPage() {
-  const session = await auth();
-  if (!session?.user?.id) redirect('/login');
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
 
-  const items = await getCartItems(Number(session.user.id));
-  const cart: CartLine[] = items.flatMap((it) => {
+  const { data: items } = await supabase
+    .from('cart_items')
+    .select('product_id, quantity')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: true });
+
+  const cart: CartLine[] = (items ?? []).flatMap((it) => {
     const product = products.find((p) => p.id === it.product_id);
-    return product ? [{ product, quantity: it.quantity }] : [];
+    return product ? [{ product, quantity: it.quantity as number }] : [];
   });
 
   return (

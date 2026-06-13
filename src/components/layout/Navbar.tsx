@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ShoppingBag, Sparkles, User } from 'lucide-react';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/client';
 
 const NAV = [
   { href: '/about', label: '회사소개', en: 'About' },
@@ -17,9 +18,17 @@ const NAV = [
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const pathname = usePathname();
-  const { data: session } = useSession();
-  const user = session?.user;
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => setUser(session?.user ?? null));
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -31,6 +40,8 @@ export default function Navbar() {
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
+  const displayName = (user?.user_metadata?.name as string | undefined) ?? '마이페이지';
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4">
@@ -87,7 +98,7 @@ export default function Navbar() {
               href="/mypage"
               className="hidden h-9 items-center gap-1.5 rounded-full bg-white/50 px-3 text-sm font-medium text-assi-ink transition-colors hover:bg-white/80 sm:inline-flex"
             >
-              <User size={16} /> {user.name ?? '마이페이지'}
+              <User size={16} /> {displayName}
             </Link>
           ) : (
             <Link

@@ -4,7 +4,6 @@ import { Space_Grotesk, Noto_Sans_KR } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import Providers from './providers';
 
 // 영문: 모던하고 시크한 산세리프
 const display = Space_Grotesk({
@@ -38,11 +37,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <div className="pointer-events-none fixed -left-32 top-24 -z-10 h-96 w-96 rounded-full bg-assi-lavender opacity-50 blur-3xl" />
         <div className="pointer-events-none fixed -right-24 top-1/3 -z-10 h-80 w-80 rounded-full bg-assi-pink opacity-50 blur-3xl" />
 
-        <Providers>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-        </Providers>
+        <Navbar />
+        <main>{children}</main>
+        <Footer />
       </body>
     </html>
   );

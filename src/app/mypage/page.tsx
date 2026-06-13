@@ -1,8 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Sparkles, ShoppingBag, Package, Mail, ChevronRight } from 'lucide-react';
-import { auth } from '@/auth';
-import { getUserByEmail, getCartCount } from '@/lib/db';
+import { createClient } from '@/lib/supabase/server';
 import GlassCard from '@/components/ui/GlassCard';
 import ProfileForm from '@/components/account/ProfileForm';
 import LogoutButton from '@/components/auth/LogoutButton';
@@ -10,14 +9,15 @@ import LogoutButton from '@/components/auth/LogoutButton';
 export const dynamic = 'force-dynamic';
 
 export default async function MyPage() {
-  const session = await auth();
-  if (!session?.user?.id || !session.user.email) redirect('/login');
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
 
-  const [user, cartCount] = await Promise.all([
-    getUserByEmail(session.user.email),
-    getCartCount(Number(session.user.id)),
-  ]);
-  const name = user?.name ?? session.user.name ?? '회원';
+  const name = (user.user_metadata?.name as string | undefined) ?? '회원';
+  const { data: items } = await supabase.from('cart_items').select('quantity').eq('user_id', user.id);
+  const cartCount = (items ?? []).reduce((sum, it) => sum + (it.quantity as number), 0);
 
   return (
     <div className="px-4 pb-10 pt-32">
@@ -29,7 +29,7 @@ export default async function MyPage() {
           안녕하세요, {name}님 ✨
         </h1>
         <p className="mt-2 flex items-center gap-1.5 text-sm text-assi-ink/60">
-          <Mail size={14} /> {session.user.email}
+          <Mail size={14} /> {user.email}
         </p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
