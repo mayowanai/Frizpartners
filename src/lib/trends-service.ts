@@ -43,26 +43,46 @@ export async function getInstagramFeed(): Promise<InstagramPost[]> {
   }
 }
 
-/** YouTube Data API v3 — GET /youtube/v3/search */
+/** YouTube 제목의 HTML 엔티티 디코딩 (&amp; 등) */
+const decodeHtml = (s: string): string =>
+  s
+    .replace(/&amp;/g, '&')
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+
+/** YouTube Data API v3 — 키워드 검색으로 인기 뷰티 영상 수집 */
 export async function getYouTubeVideos(): Promise<YouTubeVideo[]> {
   const key = process.env.YOUTUBE_API_KEY;
-  const channelId = process.env.YOUTUBE_CHANNEL_ID;
-  if (!key || !channelId) return mockYouTube;
+  if (!key) return mockYouTube;
 
+  const query = process.env.YOUTUBE_SEARCH_QUERY ?? 'K뷰티 신상 리뷰';
   try {
-    const url = `https://www.googleapis.com/youtube/v3/search?key=${key}&channelId=${channelId}&part=snippet&order=date&type=video&maxResults=6`;
+    const url =
+      `https://www.googleapis.com/youtube/v3/search?key=${key}` +
+      `&q=${encodeURIComponent(query)}&part=snippet&type=video&order=viewCount` +
+      `&maxResults=6&regionCode=KR&relevanceLanguage=ko`;
     const res = await fetch(url, { next: { revalidate: REVALIDATE } });
     if (!res.ok) throw new Error(`YouTube API ${res.status}`);
 
     const json = (await res.json()) as {
-      items?: Array<{ id: { videoId: string }; snippet: { title: string; channelTitle: string } }>;
+      items?: Array<{
+        id: { videoId: string };
+        snippet: {
+          title: string;
+          channelTitle: string;
+          thumbnails?: { medium?: { url: string }; high?: { url: string } };
+        };
+      }>;
     };
     return (json.items ?? []).map((it, i): YouTubeVideo => ({
       id: it.id.videoId,
-      title: it.snippet.title,
+      title: decodeHtml(it.snippet.title),
       channelTitle: it.snippet.channelTitle,
       url: `https://www.youtube.com/watch?v=${it.id.videoId}`,
-      views: '신규 업로드',
+      views: 'YouTube에서 보기',
+      thumbnail: it.snippet.thumbnails?.high?.url ?? it.snippet.thumbnails?.medium?.url,
       gradient: pickGradient(i),
     }));
   } catch (err) {

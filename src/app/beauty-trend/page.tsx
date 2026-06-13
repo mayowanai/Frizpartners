@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import Image from 'next/image';
 import { Instagram, Youtube, Newspaper, TrendingUp, ArrowUpRight, Heart } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import { getTrendKeywords } from '@/lib/trends-service';
@@ -114,8 +115,18 @@ export default async function BeautyTrendPage() {
                 rel="noopener noreferrer"
                 className="group glass-card overflow-hidden"
               >
-                <div className={`relative aspect-video bg-gradient-to-br ${v.gradient}`}>
-                  <div className="absolute inset-0 bg-glass-sheen opacity-50" />
+                <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${v.gradient}`}>
+                  {v.thumbnail ? (
+                    <Image
+                      src={v.thumbnail}
+                      alt={v.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-glass-sheen opacity-50" />
+                  )}
                   <span className="absolute left-1/2 top-1/2 grid h-12 w-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white/70 text-assi-grape backdrop-blur-md transition-transform group-hover:scale-110">
                     <Youtube size={20} />
                   </span>

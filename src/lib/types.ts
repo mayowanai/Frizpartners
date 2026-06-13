@@ -43,6 +43,8 @@ export interface YouTubeVideo {
   channelTitle: string;
   url: string;
   views: string;
+  /** 실 API 연동 시 YouTube 썸네일 URL (mock 은 gradient 로 대체) */
+  thumbnail?: string;
   gradient: string;
 }
 
