@@ -2,42 +2,18 @@ import type { ReactNode } from 'react';
 import Image from 'next/image';
 import { Instagram, Youtube, Newspaper, TrendingUp, ArrowUpRight, Heart } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
-import { getTrendKeywords } from '@/lib/trends-service';
-import { mockInstagram, mockYouTube, mockNews } from '@/lib/data/trends';
-import type { InstagramPost, YouTubeVideo, NewsArticle } from '@/lib/types';
+import { getInstagramFeed, getYouTubeVideos, getNews, getTrendKeywords } from '@/lib/trends-service';
 
 // ISR: 1시간마다 정적 재생성
 export const revalidate = 3600;
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-
-/**
- * Route Handler(/api/trends/*)를 호출해 데이터를 받아옵니다.
- * 빌드/오프라인 등으로 self-fetch가 실패하면 Mock 데이터로 폴백하여 항상 렌더링됩니다.
- */
-async function fetchTrend<T>(path: string, fallback: T): Promise<T> {
-  // 프로덕션 빌드(정적 프리렌더) 단계에는 자체 서버가 없으므로 Mock으로 정적 생성하고,
-  // 런타임 요청 / ISR 재검증 시 Route Handler에서 실데이터를 받아옵니다.
-  if (process.env.NEXT_PHASE === 'phase-production-build') return fallback;
-  try {
-    const res = await fetch(`${BASE_URL}${path}`, { next: { revalidate } });
-    if (!res.ok) throw new Error(`${path} → ${res.status}`);
-    const json = (await res.json()) as { data: T };
-    return json.data;
-  } catch (err) {
-    console.warn('[beauty-trend] Route Handler 호출 실패 → Mock 폴백:', (err as Error).message);
-    return fallback;
-  }
-}
-
 export default async function BeautyTrendPage() {
-  // ✅ 백엔드(Route Handler)가 외부 API를 Fetch → 프론트로 전달하는 아키텍처
+  // 서비스 레이어 직접 호출 (Route Handler /api/trends/* 와 동일 함수).
+  // 키가 있으면 외부 API 실데이터, 없으면 Mock 폴백. 빌드 시점에도 실데이터로 정적 생성됨.
   const [instagram, youtube, news] = await Promise.all([
-    fetchTrend<InstagramPost[]>('/api/trends/instagram', mockInstagram),
-    fetchTrend<YouTubeVideo[]>('/api/trends/youtube', mockYouTube),
-    fetchTrend<NewsArticle[]>('/api/trends/news', mockNews),
+    getInstagramFeed(),
+    getYouTubeVideos(),
+    getNews(),
   ]);
   const keywords = getTrendKeywords();
 
