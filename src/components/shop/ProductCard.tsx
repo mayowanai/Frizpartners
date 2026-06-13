@@ -1,8 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ShoppingBag } from 'lucide-react';
 import type { Product } from '@/lib/types';
+import AddToCartButton from '@/components/shop/AddToCartButton';
 
 /**
  * 제품 카드 — 가격 정보 + 핵심 자연 성분 태그(Badge)를 명확히 배치.
@@ -74,12 +74,10 @@ export default function ProductCard({ product }: { product: Product }) {
               </span>
             )}
           </div>
-          <button
-            aria-label="장바구니 담기"
-            className="grid h-10 w-10 place-items-center rounded-full bg-assi-ink text-white transition-all hover:bg-assi-grape group-hover:scale-105"
-          >
-            <ShoppingBag size={16} />
-          </button>
+          <AddToCartButton
+            productId={product.id}
+            className="grid h-10 w-10 place-items-center rounded-full bg-assi-ink text-white transition-all hover:bg-assi-grape group-hover:scale-105 disabled:opacity-60"
+          />
         </div>
       </div>
     </motion.article>

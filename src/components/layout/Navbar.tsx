@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ShoppingBag, Sparkles } from 'lucide-react';
+import { Menu, X, ShoppingBag, Sparkles, User } from 'lucide-react';
 
 const NAV = [
   { href: '/about', label: '회사소개', en: 'About' },
@@ -17,6 +18,8 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const user = session?.user;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -25,7 +28,6 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // 페이지 이동 시 모바일 메뉴 닫기
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
@@ -72,12 +74,30 @@ export default function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2">
-          <button
+          <Link
+            href="/cart"
             aria-label="장바구니"
             className="grid h-9 w-9 place-items-center rounded-full bg-white/50 text-assi-ink transition-colors hover:bg-white/80"
           >
             <ShoppingBag size={18} />
-          </button>
+          </Link>
+
+          {user ? (
+            <Link
+              href="/mypage"
+              className="hidden h-9 items-center gap-1.5 rounded-full bg-white/50 px-3 text-sm font-medium text-assi-ink transition-colors hover:bg-white/80 sm:inline-flex"
+            >
+              <User size={16} /> {user.name ?? '마이페이지'}
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="hidden h-9 items-center rounded-full bg-assi-ink px-4 text-sm font-medium text-white transition-colors hover:bg-assi-grape sm:inline-flex"
+            >
+              로그인
+            </Link>
+          )}
+
           <button
             aria-label="메뉴"
             onClick={() => setOpen((v) => !v)}
@@ -90,24 +110,40 @@ export default function Navbar() {
 
       <AnimatePresence>
         {open && (
-          <motion.ul
+          <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             className="glass-card mx-auto mt-2 max-w-6xl overflow-hidden p-2 md:hidden"
           >
-            {NAV.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-medium text-assi-ink hover:bg-white/60"
-                >
-                  {item.label}
-                  <span className="font-display text-xs text-assi-plum">{item.en}</span>
+            <ul>
+              {NAV.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-medium text-assi-ink hover:bg-white/60"
+                  >
+                    {item.label}
+                    <span className="font-display text-xs text-assi-plum">{item.en}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-1 border-t border-white/40 pt-1">
+              <Link href="/cart" className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-assi-ink hover:bg-white/60">
+                <ShoppingBag size={16} /> 장바구니
+              </Link>
+              {user ? (
+                <Link href="/mypage" className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-assi-ink hover:bg-white/60">
+                  <User size={16} /> 마이페이지
                 </Link>
-              </li>
-            ))}
-          </motion.ul>
+              ) : (
+                <Link href="/login" className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-assi-grape hover:bg-white/60">
+                  <User size={16} /> 로그인 / 회원가입
+                </Link>
+              )}
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </header>
