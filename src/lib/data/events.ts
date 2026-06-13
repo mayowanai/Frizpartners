@@ -1,0 +1,58 @@
+import type { EventPost } from '@/lib/types';
+
+export const events: EventPost[] = [
+  {
+    id: 'launch',
+    title: '오로라 젤리 미스트 단독 런칭',
+    description: '시그니처 출시 기념, 선착순 1,000명 미니어처 증정.',
+    period: '~ 6.30',
+    tag: 'LAUNCH',
+    span: 'tall',
+    gradient: 'from-assi-lavender to-assi-pink',
+  },
+  {
+    id: 'welcome',
+    title: '신규 가입 15% 쿠폰',
+    description: '첫 구매를 위한 웰컴 혜택을 받아보세요.',
+    period: '상시',
+    tag: 'WELCOME',
+    span: 'short',
+    gradient: 'from-assi-pink to-assi-yellow',
+  },
+  {
+    id: 'empty-bottle',
+    title: '공병 리워드 캠페인',
+    description: '다 쓴 업사이클링 공병을 가져오면 적립금으로 돌려드려요.',
+    period: '~ 7.15',
+    tag: 'ECO',
+    span: 'short',
+    gradient: 'from-emerald-100 to-assi-lavender',
+  },
+  {
+    id: 'bundle',
+    title: '젤리 듀오 기획세트',
+    description: '미스트 + 세럼을 합리적인 가격에 만나는 한정 구성.',
+    period: '~ 6.25',
+    tag: 'SET',
+    span: 'tall',
+    gradient: 'from-purple-200 to-assi-pink',
+  },
+  {
+    id: 'review',
+    title: '포토 리뷰 이벤트',
+    description: '베스트 리뷰 선정 시 3만원 상당 풀세트 증정.',
+    period: '매월',
+    tag: 'REVIEW',
+    span: 'short',
+    gradient: 'from-assi-yellow to-assi-pink',
+  },
+  {
+    id: 'friend',
+    title: '친구 추천 더블 적립',
+    description: '추천하고 추천받고, 둘 다 5,000원 적립.',
+    period: '상시',
+    tag: 'INVITE',
+    span: 'short',
+    gradient: 'from-assi-pink to-assi-lavender',
+  },
+];

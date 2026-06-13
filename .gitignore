@@ -1,22 +1,46 @@
-# Claude Code 로컬 설정 (개인/머신 전용 — 공유하지 않음)
-.claude/settings.local.json
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
 
 # OS 생성 파일
 .DS_Store
 Thumbs.db
 Desktop.ini
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# 환경 변수 (.env.example 은 추적함)
+.env
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
 
 # 에디터 / IDE
 .vscode/
 .idea/
 *.swp
 
-# 로그 / 임시 파일
-*.log
-*.tmp
-*.temp
-
-# 환경 변수 / 비밀값
-.env
-.env.local
-.env.*.local
+# Claude Code 로컬 설정 (개인/머신 전용)
+.claude/settings.local.json
